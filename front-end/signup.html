@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <link rel="stylesheet" href="/front-end/css/signup.css">
+</head>
+<body>
+    <form id="registrationForm">
+        <h2>Open the Door to Financial Freedom</h2>
+        <label for="custid">Customer ID:</label>
+        <input type="text" name="custid" required>
+        <label for="customername">Customer Name:</label>
+        <input type="text" name="customerName" required>
+        <label for="accountType">Account Type:</label>
+        <input type="text" name="accountType" required>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" name="phoneNumber" required>
+        <label for="aadharCard">Aadhar Card Number:</label>
+        <input type="text" name="aadharCard" required>
+        <button type="submit">Register</button>
+    </form>
+    <script>
+        document.querySelector('#registrationForm').addEventListener('submit', function(event) {
+            console.log('Form submitted');
+            event.preventDefault();
+
+            const data = {
+                custid: document.querySelector('input[name="custid"]').value,
+                customerName: document.querySelector('input[name="customerName"]').value,
+                accountType: document.querySelector('input[name="accountType"]').value,
+                email: document.querySelector('input[name="email"]').value,
+                phone: document.querySelector('input[name="phoneNumber"]').value,
+                aadharcard: document.querySelector('input[name="aadharCard"]').value,
+                balance: 0
+            };
+
+            fetch('http://localhost:3001/accounts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(result => {
+                alert('Registration successful!');
+                window.location.href = 'login.html';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>

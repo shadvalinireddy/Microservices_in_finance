@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Page</title>
+    <link rel="stylesheet" href="/front-end/css/services.css">
+    <link rel="stylesheet" href="/front-end/css/styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Services</h2>
+        <button class="service-button" onclick="showService('account')">Account</button>
+        <button class="service-button" onclick="showService('insurance')">Insurance</button>
+        <button class="service-button" onclick="showService('loans')">Loans</button>
+        <button class="service-button" onclick="showService('transactions')">Transactions</button>
+        <button class="service-button" onclick="showService('notifications')">Notifications</button>
+    </div>
+
+    <div class="main-content" id="serviceContent">
+        <h3>Welcome to Our Financial Services</h3>
+        <p>It’s simple arithmetic: Your income can grow only to the extent that you do.</p>
+    </div>
+
+    <div class="header">
+        <h3 class="welcome-message">Welcome, <span id="accountHolderName"></span></h3>
+    </div>
+
+    <!-- New Insurance Form (hidden by default) -->
+    <div id="newInsuranceForm" style="display:none;">
+        <h4>Create New Insurance</h4>
+        <form id="insuranceForm">
+            <label for="insuranceid">Insurance ID:</label>
+            <input type="text" id="insuranceid" name="insuranceid" required>
+            <br>
+            <label for="insuranceType">Insurance Type:</label>
+            <input type="text" id="insuranceType" name="insuranceType" required>
+            <br>
+            <label for="claimAmount">Claim Amount:</label>
+            <input type="number" id="claimAmount" name="claimAmount" required>
+            <br><br>
+            <button type="submit">Create Insurance</button>
+        </form>
+        <button onclick="cancelInsuranceForm()">Cancel</button>
+    </div>
+
+    <div id="newLoanForm" style="display: none;">
+        <form id="loanForm">
+            <label for="loanid">Loan ID:</label>
+            <input type="text" id="loanid" required><br>
+            
+            <label for="loanType">Loan Type:</label>
+            <input type="text" id="loanType" required><br>
+            
+            <label for="loanAmount">Loan Amount:</label>
+            <input type="number" id="loanAmount" required><br>
+            
+            <label for="status">Status:</label>
+            <input type="text" id="status" required><br>
+            
+            <button type="submit">Create Loan</button>
+            <button type="button" onclick="cancelLoanForm()">Cancel</button>
+        </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+            if (!isLoggedIn || isLoggedIn !== 'true') {
+                alert('User not logged in. Redirecting to login page...');
+                window.location.href = 'login.html';
+            } else {
+                document.getElementById('accountHolderName').textContent = localStorage.getItem('loggedInEmail');
+            }
+        });
+
+        function showService(serviceName) {
+    const email = localStorage.getItem('loggedInEmail');
+    if (!email) {
+        console.error('No email found in local storage.');
+        document.getElementById('serviceContent').innerHTML = '<p>Error: No email found. Please log in again.</p>';
+        return;
+    }
+
+    if (serviceName === 'account') {
+        fetch(`http://localhost:3001/accounts/${email}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load account details.');
+                return response.json();
+            })
+            .then(data => {
+                const accountDetails = `
+                    <h4>Account Details</h4>
+                    <p>Customer ID: ${data.custid}</p>
+                    <p>Name: ${data.customerName}</p>
+                    <p>Email: ${data.email}</p>
+                    <p>Account Type: ${data.accountType}</p>
+                    <p>Aadhar Card: ${data.aadharcard}</p>
+                    <p>Balance: ${data.balance}</p>
+                    <button onclick="deleteAccount('${data.email}')">Delete</button>
+                `;
+                document.getElementById('serviceContent').innerHTML = accountDetails;
+            })
+            .catch(err => {
+                console.error('Error fetching account details:', err);
+                document.getElementById('serviceContent').innerHTML = '<p>Error loading account details. Please try again.</p>';
+            });
+    } else if (serviceName === 'insurance') {
+        fetch(`http://localhost:3003/insurance/${email}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load insurance details.');
+                return response.json();
+            })
+            .then(data => {
+                let insuranceDetails = `
+                    <h4>Insurance Policies</h4>
+                    <p>Email: ${email}</p>
+                    <ul>
+                `;
+                data.forEach(item => {
+                    insuranceDetails += `
+                        <li>
+                            <strong>Insurance ID:</strong> ${item.insuranceid}<br>
+                            <strong>Type:</strong> ${item.insuranceType}<br>
+                            <strong>Status:</strong> ${item.status}<br>
+                            <button onclick="updateInsurance('${item.insuranceid}')">Update</button>
+                            <button onclick="deleteInsurance('${item.insuranceid}')">Delete</button>
+                        </li>
+                    `;
+                });
+                insuranceDetails += `</ul><button onclick="showNewInsuranceForm()">New Insurance</button>`;
+                document.getElementById('serviceContent').innerHTML = insuranceDetails;
+            })
+            .catch(err => {
+                console.error('Error fetching insurance details:', err);
+                document.getElementById('serviceContent').innerHTML = '<p>Error loading insurance details. Please try again.</p>';
+            });
+    } else if (serviceName === 'loans') {
+        fetch(`http://localhost:3002/loans/${email}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load loan details.');
+                return response.json();
+            })
+            .then(data => {
+                let loanDetails = `
+                    <h4>Loan Details</h4>
+                    <p>Email: ${email}</p>
+                    <ul>
+                `;
+                data.forEach(item => {
+                    loanDetails += `
+                        <li>
+                            <strong>Loan ID:</strong> ${item.loanid}<br>
+                            <strong>Type:</strong> ${item.loanType}<br>
+                            <strong>Amount:</strong> ${item.loanAmount}<br>
+                            <button onclick="updateLoan('${item.loanid}')">Update</button>
+                            <button onclick="deleteLoan('${item.loanid}')">Delete</button>
+                        </li>
+                    `;
+                });
+                loanDetails += `</ul><button onclick="showNewLoanForm()">New Loan</button>`;
+                document.getElementById('serviceContent').innerHTML = loanDetails;
+            })
+            .catch(err => {
+                console.error('Error fetching loan details:', err);
+                document.getElementById('serviceContent').innerHTML = '<p>Error loading loan details. Please try again.</p>';
+            });
+   } else  if (serviceName === 'transactions') {
+                fetch(`http://localhost:3004/transactions/${email}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to load transaction details.');
+                        return response.json();
+                    })
+                    .then(data => {
+                        let transactionDetails = `
+                            <h4>Transaction Details</h4>
+                            <p>Email: ${email}</p>
+                            <ul>
+                        `;
+                        data.forEach(item => {
+                            transactionDetails += `
+                                <li>
+                                    <strong>Transaction ID:</strong> ${item.transactionid}<br>
+                                    <strong>Receiver:</strong> ${item.receiverEmail}<br>
+                                    <strong>Amount:</strong> ${item.amount}<br>
+                                    <button onclick="deleteTransaction('${item.transactionid}')">Delete</button>
+                                </li>
+                            `;
+                        });
+                        transactionDetails += `</ul><button onclick="showNewTransactionForm()">New Transaction</button>`;
+                        document.getElementById('serviceContent').innerHTML = transactionDetails;
+                    })
+                    .catch(err => {
+                        console.error('Error fetching transaction details:', err);
+                        document.getElementById('serviceContent').innerHTML = '<p>Error loading transaction details. Please try again.</p>';
+                    });
+            } else if (serviceName === 'notifications') {
+    // Define the function to fetch notifications
+    function loadNotifications() {
+        // Start the fetch request
+        fetch(`http://localhost:3000/notifications/${email}`)
+            .then(response => {
+                // Check if the response is okay
+                if (!response.ok) {
+                    throw new Error('Failed to load notifications.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Check if there are notifications
+                if (data.length === 0) {
+                    document.getElementById('serviceContent').innerHTML = '<p>No notifications available for this email.</p>';
+                    return;
+                }
+
+                // Generate the notification details HTML
+                let notificationDetails = `
+                    <h4>Notifications</h4>
+                    <p>Email: ${email}</p>
+                    <ul>
+                `;
+                data.forEach(item => {
+                    notificationDetails += `
+                        <li>
+                            <strong>Message:</strong> ${item.message || 'No message content'}<br>
+                            <strong>Created At:</strong> ${new Date(item.createdTimestamp).toLocaleString()}<br>
+                        </li>
+                    `;
+                });
+                notificationDetails += `</ul>`;
+
+                // Add the Load Notifications button below the notifications
+                notificationDetails += `
+                    <button id="loadNotificationsBtn">Load Notifications</button>
+                `;
+
+                // Display the notifications and button
+                document.getElementById('serviceContent').innerHTML = notificationDetails;
+
+                // Add event listener to the Load Notifications button
+                document.getElementById('loadNotificationsBtn').addEventListener('click', loadNotifications);
+            })
+            .catch(err => {
+                // Log the error and display a message to the user
+                console.error('Error fetching notifications:', err);
+                document.getElementById('serviceContent').innerHTML = '<p>Error loading notifications. Please try again later.</p>';
+            });
+    }
+
+    // Initial load of notifications
+    loadNotifications();
+}
+
+}
+
+function showNewTransactionForm() {
+            document.getElementById('newTransactionForm').style.display = 'block';
+        }
+
+        function cancelTransactionForm() {
+            document.getElementById('newTransactionForm').style.display = 'none';
+        }
+
+        document.getElementById('transactionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const receiverEmail = document.getElementById('receiverEmail').value;
+            const transactionid = document.getElementById('transactionid').value;
+            const amount = document.getElementById('amount').value;
+            const senderEmail = localStorage.getItem('loggedInEmail');
+
+            // Send the new transaction data to the back-end
+            fetch('http://localhost:3004/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    senderEmail,
+                    receiverEmail,
+                    transactionid,
+                    amount
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Transaction created successfully.');
+                showService('transactions'); // Reload the transactions page
+                cancelTransactionForm(); // Hide the form
+            })
+            .catch(error => {
+                console.error('Error creating transaction:', error);
+                alert('Failed to create transaction. Please try again.');
+            });
+        });
+
+        function deleteTransaction(transactionid) {
+            if (confirm('Are you sure you want to delete this transaction?')) {
+                fetch(`http://localhost:3004/transactions/${transactionid}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.status === 204) {
+                        alert('Transaction deleted successfully.');
+                        showService('transactions');
+                    } else {
+                        alert('Failed to delete transaction.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error deleting transaction:', err);
+                    alert('Error deleting transaction. Please try again.');
+                });
+            }
+        }
+
+   function showNewInsuranceForm() {
+            document.getElementById('newInsuranceForm').style.display = 'block';
+        }
+
+        function cancelInsuranceForm() {
+            document.getElementById('newInsuranceForm').style.display = 'none';
+        }
+
+        document.getElementById('insuranceForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const insuranceid = document.getElementById('insuranceid').value;
+            const insuranceType = document.getElementById('insuranceType').value;
+            const claimAmount = document.getElementById('claimAmount').value;
+            const email = localStorage.getItem('loggedInEmail');
+            
+            // Send the new insurance data to the back-end
+            fetch('http://localhost:3003/insurance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    insuranceid,  // Pass the insuranceid entered by the user
+                    email,
+                    insuranceType,
+                    claimAmount
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Insurance created successfully.');
+                showService('insurance'); // Reload the insurance page
+                cancelInsuranceForm(); // Hide the form
+            })
+            .catch(error => {
+                console.error('Error creating insurance:', error);
+                alert('Failed to create insurance. Please try again.');
+            });
+        });
+
+        function updateInsurance(insuranceid) {
+            const attribute = prompt('Enter attribute to update (e.g., insuranceType, status):');
+            const value = prompt('Enter new value:');
+            
+            if (attribute && value) {
+                fetch(`http://localhost:3003/insurance/${insuranceid}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [attribute]: value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Insurance updated successfully.');
+                    showService('insurance');
+                })
+                .catch(err => console.error('Error updating insurance:', err));
+            }
+        }
+
+        function deleteInsurance(insuranceid) {
+            if (confirm('Are you sure you want to delete this insurance?')) {
+                fetch(`http://localhost:3003/insurance/${insuranceid}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.status === 204) {
+                        alert('Insurance deleted successfully.');
+                        showService('insurance');
+                    } else {
+                        alert('Failed to delete insurance.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error deleting insurance:', err);
+                    alert('Error deleting insurance. Please try again.');
+                });
+            }
+        }
+        function updateAccount(email) {
+    const attribute = prompt('Enter attribute to update (e.g., customerName, phone, address):');
+    const value = prompt('Enter new value:');
+    
+    if (attribute && value) {
+        fetch(`http://localhost:3001/accounts/${email}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [attribute]: value })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update account');
+            }
+            return response.json();
+        })
+        .then(updatedAccount => {
+            alert('Account updated successfully');
+            
+            // After updating, show the updated account details
+            showAccountDetails(updatedAccount);
+        })
+        .catch(err => {
+            console.error('Error updating account:', err);
+            alert('Error updating account. Please try again.');
+        });
+    }
+}
+
+function showAccountDetails(updatedAccount) {
+    // Assuming you have a div with id 'accountDetails' to display the account info
+    const accountDetails = document.getElementById('accountDetails');
+
+    // Clear existing content
+    accountDetails.innerHTML = '';
+
+    // Display the updated account details
+    accountDetails.innerHTML = `
+        <h3>Account Details</h3>
+        <p><strong>Email:</strong> ${updatedAccount.email}</p>
+        <p><strong>Customer Name:</strong> ${updatedAccount.customerName}</p>
+        <p><strong>Phone:</strong> ${updatedAccount.phone}</p>
+        <p><strong>Address:</strong> ${updatedAccount.address}</p>
+        <p><strong>Status:</strong> ${updatedAccount.status}</p>
+    `;
+}
+
+
+        function deleteAccount(email) {
+            if (confirm('Are you sure you want to delete this account?')) {
+                fetch(`http://localhost:3001/accounts/${email}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete account.');
+                    }
+                    alert('Account deleted successfully.');
+                    // Optionally refresh the account service view
+                    showService('account');
+                })
+                .catch(err => {
+                    console.error('Error deleting account:', err);
+                    alert('Account deletion error.');
+                });
+            }
+        }
+        function showNewLoanForm() {
+    document.getElementById('newLoanForm').style.display = 'block';
+}
+
+function cancelLoanForm() {
+    document.getElementById('newLoanForm').style.display = 'none';
+}
+
+// Event listener for loan form submission
+document.getElementById('loanForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    
+    // Get form values
+    const loanid = document.getElementById('loanid').value;
+    const loanType = document.getElementById('loanType').value;
+    const loanAmount = document.getElementById('loanAmount').value;
+    const status = document.getElementById('status').value; // Assuming a status input field exists
+    const email = localStorage.getItem('loggedInEmail');
+
+    // Validate input
+    if (!loanid || !loanType || !loanAmount || !status || !email) {
+        alert('All fields are required.');
+        return;
+    }
+
+    // Send the new loan data to the back-end
+    fetch('http://localhost:3002/loans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            loanid,
+            email,
+            loanType,
+            loanAmount,
+            status // Include status in request body
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to create loan');
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert('Loan created successfully.');
+        showService('loans'); // Reload the loan page
+        cancelLoanForm(); // Hide the form
+    })
+    .catch(error => {
+        console.error('Error creating loan:', error);
+        alert('Failed to create loan. Please try again.');
+    });
+});
+
+function updateLoan(loanid) {
+    const attribute = prompt('Enter attribute to update (e.g., loanType, loanAmount, status):');
+    const value = prompt('Enter new value:');
+    
+    if (attribute && value) {
+        fetch(`http://localhost:3002/loans/${loanid}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [attribute]: value })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update loan');
+            }
+            return response.json();
+        })
+        .then(() => {
+            alert('Loan updated successfully');
+            showService('loans');
+        })
+        .catch(err => {
+            console.error('Error updating loan:', err);
+            alert('Error updating loan. Please try again.');
+        });
+    }
+}
+
+function deleteLoan(loanid) {
+    const confirmation = confirm('Are you sure you want to delete this loan?');
+    if (confirmation) {
+        fetch(`http://localhost:3002/loans/${loanid}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete loan');
+            }
+            alert('Loan deleted successfully');
+            showService('loans');
+        })
+        .catch(err => {
+            console.error('Error deleting loan:', err);
+            alert('Error deleting loan. Please try again.');
+        });
+    }
+}
+</script>
+</body>
+</html>

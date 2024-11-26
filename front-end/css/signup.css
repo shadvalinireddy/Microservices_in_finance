@@ -1,0 +1,83 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #e6f7ff; /* Light blue background */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+form {
+    background-color: #ffffff;
+    border: 2px solid #007acc; /* Deep blue border */
+    border-radius: 10px;
+    padding: 20px 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 139, 0.2); /* Shadow for a subtle 3D effect */
+    width: 350px;
+}
+
+h2 {
+    color: #004080; /* Darker blue */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #004d99; /* Medium blue */
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #66b2ff; /* Lighter blue */
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #0059b3; /* Focus border */
+    outline: none;
+}
+
+button[type="submit"] {
+    width: 100%;
+    background-color: #007acc; /* Deep blue */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #005c99; /* Darker blue on hover */
+}
+
+.ad-container {
+    margin-top: 10px;
+    background-color: #e0f0ff; /* Very light blue */
+    border: 2px dotted #99ccff; /* Dotted light blue border */
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    color: #004080;
+    position: fixed; /* Position at the bottom */
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%; /* Adjust as needed for your design */
+    box-sizing: border-box;
+}
+

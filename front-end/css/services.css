@@ -1,0 +1,167 @@
+body {
+    background-color: #f0f8ff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #4682b4;
+    color: #ffffff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.sidebar button {
+    background: none;
+    color: #ffffff;
+    border: none;
+    text-align: left;
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #5f9ea0;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.sidebar button:hover {
+    background-color: #5f9ea0;
+    transform: scale(1.05);
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #ffffff;
+    box-shadow: inset 0 0 10px rgba(0, 128, 128, 0.1);
+    border-radius: 0 10px 10px 0;
+    min-height: 100vh;
+}
+
+.main-content h3 {
+    color: #2f4f4f;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.main-content p {
+    color: #000e06;
+    font-size: 16px;
+    margin-bottom: 10px;
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 128, 128, 0.1);
+}
+
+.service-button {
+    margin: 10px 0;
+    padding: 12px;
+    background-color: #87cefa;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.service-button:hover {
+    background-color: #00bfff;
+    transform: scale(1.05);
+}
+
+.header {
+    text-align: right;
+    padding: 10px 20px;
+    border-bottom: 2px solid #87cefa;
+    background-color: #f5f5f5;
+}
+
+.welcome-message {
+    font-size: 18px;
+    color: #4682b4;
+    font-weight: bold;
+    border: 2px solid #4682b4;
+    padding: 5px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* Insurance and Loan Service Forms */
+.service-form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.service-form label {
+    font-size: 16px;
+    color: #2f4f4f;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.service-form input, .service-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.service-form button {
+    padding: 12px;
+    background-color: #4682b4;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.service-form button:hover {
+    background-color: #5f9ea0;
+    transform: scale(1.05);
+}
+
+
+/* Hidden form containers */
+#newInsuranceForm, #newLoanForm, #newTransactionForm {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    margin-top: 20px;
+}
+
+#newInsuranceForm input, #newLoanForm input, #newTransactionForm input {
+    width: 50%;
+}
+
+/* Notification Section */
+ul li {
+    background-color: #ecf0f1;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+ul li strong {
+    display: block;
+    color: #2c3e50;
+}

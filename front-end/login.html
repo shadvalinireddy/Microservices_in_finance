@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="/front-end/css/login.css">
+</head>
+<body>
+    <form id="loginForm">
+        <h2>Welcome Back! Please Log In</h2>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <label for="custid">Customer ID:</label>
+        <input type="text" name="custid" required>
+        <button type="submit">Login</button>
+    </form>
+    <div id="errorMessage"></div>
+    <script>
+        document.querySelector('#loginForm').addEventListener('submit', function(event) {
+            console.log('Login form submitted');
+            event.preventDefault();
+
+            const loginData = {
+                email: document.querySelector('input[name="email"]').value,
+                custid: document.querySelector('input[name="custid"]').value
+            };
+
+            fetch('http://localhost:3001/accounts/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Login failed');
+                }
+                return response.json();
+            })
+            .then(result => {
+                // Store the user state in local storage
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('loggedInEmail', loginData.email); // Correctly store the logged-in email
+
+                alert('Login successful! Redirecting...');
+                // Redirect to the services page
+                window.location.href = 'services.html'; // Change this to your services page URL
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').innerText = 'Error: ' + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
